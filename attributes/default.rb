@@ -32,9 +32,9 @@ default['zabbix']['server']['include_dir']            = "/opt/zabbix/server_incl
 default['zabbix']['server']['log_level']              = 3
 default['zabbix']['server']['housekeeping_frequency'] = "1"
 default['zabbix']['server']['max_housekeeper_delete'] = "100000"
- 
+
 default['zabbix']['web']['install'] = false
-default['zabbix']['web']['fqdn']    = nil
+default['zabbix']['web']['fqdn']    = "zabbix.#{node[:domain]}"
 default['zabbix']['web']['aliases'] = ["zabbix"]
 
 default['zabbix']['install_dir']  = "/opt/zabbix"
