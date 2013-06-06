@@ -11,7 +11,8 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "https://dl.dropbox.com/u/31081437/Berkshelf-CentOS-6.3-x86_64-minimal.box"
 
   config.vm.hostname = "zabbix-berkshelf"
-  config.vm.network :private_network, ip: "192.168.50.10"
+  server_ip = "192.168.50.10"
+  config.vm.network :private_network, ip: server_ip
 
   config.ssh.max_tries = 40
   config.ssh.timeout   = 120
@@ -32,18 +33,20 @@ Vagrant.configure("2") do |config|
       },
       'zabbix' => {
         'agent' => {
-          'servers' => ['127.0.0.1'],
-          'servers_active' => ['127.0.0.1']
+          'servers' => [server_ip],
+          'servers_active' => [server_ip]
         },
         'web' => {
-          'install' => true
+          'install_method' => 'nginx',
+          'fqdn' => server_ip
         },
         'server' => {
           'install' => true,
+          'ipaddress' => server_ip
         },
         'database' => {
-          'dbport' => '5432',
-          'install_method' => 'postgres',
+          #'dbport' => '5432',
+          #'install_method' => 'postgres',
           'dbpassword' => 'password123'
         }
       }
@@ -51,14 +54,24 @@ Vagrant.configure("2") do |config|
 
     chef.run_list = [
       "recipe[yum::epel]",
+
+      "recipe[zabbix::default]",
+
       "recipe[database::mysql]",
       "recipe[mysql::server]",
-      "recipe[database::postgresql]",
-      "recipe[postgresql::server]",
-      "recipe[postgresql::client]",
-      "recipe[zabbix::default]",
+      #"recipe[database::postgresql]",
+      #"recipe[postgresql::server]",
       "recipe[zabbix::database]",
-      "recipe[zabbix::server]"
+
+      "recipe[mysql::client]",
+      #"recipe[postgresql::client]",
+      "recipe[zabbix::server]",
+
+      #"recipe[apache2]",
+      #"recipe[apache2::mod_php5]",
+      "recipe[zabbix::web]",
+
+      "recipe[zabbix::agent_registration]"
     ]
   end
 end

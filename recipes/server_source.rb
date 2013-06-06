@@ -7,7 +7,8 @@
 # Apache 2.0
 #
 
-include_recipe "zabbix::default"
+include_recipe "zabbix::common"
+include_recipe "zabbix::server_common"
 
 packages = Array.new
 case node['platform']
@@ -29,14 +30,14 @@ when "redhat","centos","scientific","amazon","oracle"
   case node['zabbix']['database']['install_method']
   when 'mysql', 'rds_mysql'
     php_packages = (node['platform_version'].to_i < 6)?
-      %w{ php53-mysql php53-gd php53-bcmath php53-mbstring } :
-      %w{ php-mysql php-gd php-bcmath php-mbstring }
+      %w{ php53-mysql php53-gd php53-bcmath php53-mbstring php53-xml } :
+      %w{ php-mysql php-gd php-bcmath php-mbstring php-xml }
     packages.push('mysql-devel')
     packages.push(*php_packages)
   when 'postgres'
     php_packages = (node['platform_version'].to_i < 6)?
-      %w{ php5-pgsql php5-gd } :
-      %w{ php-pgsql php-gd php-bcmath php-mbstring } 
+      %w{ php5-pgsql php5-gd php5-xml } :
+      %w{ php-pgsql php-gd php-bcmath php-mbstring php-xml }
     packages.push(*php_packages)
   end
   init_template = 'zabbix_server.init-rh.erb'
@@ -47,9 +48,9 @@ packages.each do |pck|
     action :install
   end
 end
-configure_options = Array.new
-node['zabbix']['server']['configure_options'].each do |option|
-  configure_options.push(option) unless option.match(/\s*--prefix(\s|=).+/)
+configure_options = node['zabbix']['server']['configure_options'].dup
+configure_options = (configure_options || Array.new).delete_if do |option|
+  option.match(/\s*--prefix(\s|=).+/)
 end
 case node['zabbix']['database']['install_method']
 when 'mysql', 'rds_mysql'
@@ -59,13 +60,16 @@ when 'postgres'
   with_postgresql = "--with-postgresql"
   configure_options << with_postgresql unless configure_options.include?(with_postgresql)
 end
-node.set['zabbix']['server']['configure_options'] = configure_options
+node.normal['zabbix']['server']['configure_options'] = configure_options
 
 zabbix_source "install_zabbix_server" do
   branch              node['zabbix']['server']['branch']
   version             node['zabbix']['server']['version']
+  source_url          node['zabbix']['server']['source_url']
+  branch              node['zabbix']['server']['branch']
+  version             node['zabbix']['server']['version']
   code_dir            node['zabbix']['src_dir']
-  target_dir          "zabbix-#{node['zabbix']['server']['version']}-server"  
+  target_dir          "zabbix-#{node['zabbix']['server']['version']}"
   install_dir         node['zabbix']['install_dir']
   configure_options   configure_options.join(" ")
 

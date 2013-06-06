@@ -2,43 +2,17 @@
 # Cookbook Name:: zabbix
 # Attributes:: default
 
-default['zabbix']['agent']['install']           = true
-default['zabbix']['agent']['branch']            = "ZABBIX%20Latest%20Stable"
-default['zabbix']['agent']['version']           = "2.0.6"
-default['zabbix']['agent']['servers']           = []
-default['zabbix']['agent']['servers_active']    = []
-default['zabbix']['agent']['hostname']          = node['fqdn']
-default['zabbix']['agent']['configure_options'] = [ "--with-libcurl" ]
-default['zabbix']['agent']['install_method']    = "prebuild"
-default['zabbix']['agent']['include_dir']       = "/opt/zabbix/agent_include"
-
-default['zabbix']['server']['install']  = false
-default['zabbix']['server']['version']  = "2.0.6"
-default['zabbix']['server']['branch']   = "ZABBIX%20Latest%20Stable"
-
-default['zabbix']['database']['install_method'] = "mysql"
-default['zabbix']['database']['dbname']         = "zabbix"
-default['zabbix']['database']['dbuser']         = "zabbix"
-default['zabbix']['database']['dbhost']         = "localhost"
-default['zabbix']['database']['dbpassword']     = nil
-default['zabbix']['database']['dbport']         = "3306"
-
-default['zabbix']['database']['rds_master_user']      = nil
-default['zabbix']['database']['rds_master_password']  = nil
-
-default['zabbix']['server']['install_method']         = "source"
-default['zabbix']['server']['configure_options']      = [ "--with-libcurl","--with-net-snmp"]
-default['zabbix']['server']['include_dir']            = "/opt/zabbix/server_include"
-default['zabbix']['server']['log_level']              = 3
-default['zabbix']['server']['housekeeping_frequency'] = "1"
-default['zabbix']['server']['max_housekeeper_delete'] = "100000"
-
-default['zabbix']['web']['install'] = false
-default['zabbix']['web']['fqdn']    = "zabbix.#{node[:domain]}"
-default['zabbix']['web']['aliases'] = ["zabbix"]
-
+case node['platform_family']
+when "windows"
+  if ENV['ProgramFiles'] == ENV['ProgramFiles(x86)']
+    default['zabbix']['etc_dir']    = ::File.join(ENV['homedrive'], "Program Files", "Zabbix Agent")
+  else
+    default['zabbix']['etc_dir']    = ::File.join(ENV['ProgramFiles'], "Zabbix Agent")
+  end
+else
+  default['zabbix']['etc_dir']      = "/etc/zabbix"
+end
 default['zabbix']['install_dir']  = "/opt/zabbix"
-default['zabbix']['etc_dir']      = "/etc/zabbix"
 default['zabbix']['web_dir']      = "/opt/zabbix/web"
 default['zabbix']['external_dir'] = "/opt/zabbix/externalscripts"
 default['zabbix']['alert_dir']    = "/opt/zabbix/AlertScriptsPath"
