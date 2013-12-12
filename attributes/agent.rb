@@ -13,6 +13,7 @@ default['zabbix']['agent']['hostname']          = node['fqdn']
 default['zabbix']['agent']['configure_options'] = [ "--with-libcurl" ]
 default['zabbix']['agent']['include_dir']       = ::File.join( node['zabbix']['etc_dir'] , "agent_include")
 default['zabbix']['agent']['enable_remote_commands'] = true
+default['zabbix']['agent']['listen_port']       = "10050"
 
 default['zabbix']['agent']['config_file']       = ::File.join( node['zabbix']['etc_dir'], "zabbix_agentd.conf")
 
@@ -37,3 +38,5 @@ default['zabbix']['agent']['log_file']           = nil # default (Syslog / windo
 #default['zabbix']['agent']['log_file']           = ::File.join(node['zabbix']['log_dir'], "zabbix_agentd.log"
 default['zabbix']['agent']['start_agents']       = nil # default (3)
 default['zabbix']['agent']['debug_level']        = nil # default (3)
+default['zabbix']['agent']['templates']          = []
+default['zabbix']['agent']['interfaces']         = [ "zabbix_agent" ]

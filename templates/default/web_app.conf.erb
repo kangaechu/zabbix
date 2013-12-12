@@ -3,7 +3,7 @@
   ServerAlias <%= @params[:server_aliases].join(' ')%>
   DocumentRoot <%= @params[:docroot] %>
   RewriteEngine On
-
+  
   <Directory <%= @params[:docroot] %>>
     Options +FollowSymLinks
     AllowOverride None
@@ -13,7 +13,7 @@
     php_admin_value <%=name%> <%=value%>
     <%end%>
   </Directory>
-
+  
   <Directory />
     Options FollowSymLinks
     AllowOverride None
@@ -28,8 +28,8 @@
   </Location>
 
   LogLevel info
-  ErrorLog <%= node['apache']['log_dir'] %>/<%= @application_name %>-error.log
-  CustomLog <%= node['apache']['log_dir'] %>/<%= @application_name %>-access.log combined
+  ErrorLog <%= node['apache']['log_dir'] %>/<%= @params[:server_name] %>-error.log
+  CustomLog <%= node['apache']['log_dir'] %>/<%= @params[:server_name] %>-access.log combined
 
   RewriteEngine On
   RewriteLog <%= node['apache']['log_dir'] %>/<%= @application_name %>-rewrite.log
